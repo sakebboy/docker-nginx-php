@@ -23,6 +23,8 @@ Docker nginx + php7.2 + php-fpm
 + app 
   - index.html 
   - hello-world.php
++ php-cli
+  - Dockerfile
 + php-fpm
   - Dockerfile
 ```
