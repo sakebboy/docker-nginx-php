@@ -16,6 +16,7 @@ Docker nginx + php7.2 + php-fpm
 
 站台設定異動重新加載nginx
 
+```nginx -s reload```
 
 ## docker-compose
 ```
