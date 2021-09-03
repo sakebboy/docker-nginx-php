@@ -92,16 +92,4 @@ RUN echo 'instantclient,/opt/oracle/instantclient_12_1/' | pecl install oci8-2.2
        && docker-php-ext-install \
                pdo_oci 
 
-#RUN docker-php-ext-configure mysqli \
-#	&& docker-php-ext-install -j$(nproc) mysqli \
-#	&& docker-php-ext-configure gd \
-#	&& docker-php-ext-install -j$(nproc) gd \
-#	&& docker-php-ext-configure ldap \
-#	&& docker-php-ext-configure sockets \
-#	&& docker-php-ext-install -j$(nproc) sockets \
-#	&& docker-php-ext-configure pdo_mysql \
-#	&& docker-php-ext-install -j$(nproc) pdo_mysql \
-#	&& docker-php-ext-configure zip \
-#	&& docker-php-ext-install -j$(nproc) zip \
-
 
