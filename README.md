@@ -32,7 +32,7 @@ Docker nginx + php7.2 + php-fpm
 ## nginx
 FROM nginx:latest
 
-## app
+## php-cli
 FROM php:7.2-cli
 
 ## php-fpm
