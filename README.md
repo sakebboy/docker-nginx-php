@@ -14,6 +14,9 @@ Docker nginx + php7.2 + php-fpm
 
 ```docker-compose stop```
 
+站台設定異動重新加載nginx
+
+
 ## docker-compose
 ```
 + nginx 
