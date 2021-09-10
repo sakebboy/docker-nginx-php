@@ -24,14 +24,6 @@ services:
     # corresponds to the "--network" option
     networks:
       - web-network
-  docker-php-fpm:
-    build: 
-      context: ./php-fpm
-    tty: true
-    volumes:
-      - ./app:/var/www
-    networks:
-      - web-network
   docker-nginx:
     build: 
       context: ./nginx
@@ -43,5 +35,13 @@ services:
     volumes:
       - ./app:/var/www
       - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - web-network
+  docker-php-fpm:
+    build: 
+      context: ./php-fpm
+    tty: true
+    volumes:
+      - ./app:/var/www
     networks:
       - web-network

@@ -26,7 +26,8 @@ RUN apt-get update \
 		libzip-dev \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
-	&& rm /var/log/lastlog /var/log/faillog
+	&& rm /var/log/lastlog /var/log/faillog \
+	&& pecl install redis-4.0.1
 
 # Add Microsoft repo for Microsoft ODBC Driver 13 for Linux
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
@@ -49,6 +50,7 @@ RUN pecl install apcu-5.1.5 pdo_sqlsrv-5.8.1 sqlsrv-5.8.1
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-enable sqlsrv
 RUN docker-php-ext-enable pdo_sqlsrv
+RUN docker-php-ext-enable redis
 RUN docker-php-ext-install intl
 RUN docker-php-ext-install mysqli
 RUN docker-php-ext-install pdo
