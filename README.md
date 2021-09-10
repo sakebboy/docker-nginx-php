@@ -14,6 +14,10 @@ Docker nginx + php7.2 + php-fpm
 
 ```docker-compose stop```
 
+站台設定異動重新加載nginx
+
+```nginx -s reload```
+
 ## docker-compose
 ```
 + nginx 
@@ -23,6 +27,8 @@ Docker nginx + php7.2 + php-fpm
 + app 
   - index.html 
   - hello-world.php
++ php-cli
+  - Dockerfile
 + php-fpm
   - Dockerfile
 ```
@@ -30,7 +36,7 @@ Docker nginx + php7.2 + php-fpm
 ## nginx
 FROM nginx:latest
 
-## app
+## php-cli
 FROM php:7.2-cli
 
 ## php-fpm
