@@ -29,10 +29,15 @@ RUN apt-get update \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1
 
-# Add Microsoft repo for Microsoft ODBC Driver 13 for Linux
+	
+# Add Microsoft repo for Microsoft ODBC Driver 17 for Linux
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update
+    && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+RUN apt-get update && ACCEPT_EULA=Y apt-get install -y \
+    apt-transport-https \
+    msodbcsql17	
+
 
 # Install Dependencies
 RUN ACCEPT_EULA=Y apt-get install -y unixodbc
@@ -61,7 +66,10 @@ RUN docker-php-ext-install soap
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install opcache
 RUN docker-php-ext-install gd
-
+RUN docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
+ && docker-php-ext-install pdo_odbc
+ 
+ 
 # 逐步安裝避免出現Cannot find ldap.h
 RUN apt-get install libldap2-dev -y \ 
 	&& rm -rf /var/lib/apt/lists/* \
