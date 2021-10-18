@@ -29,6 +29,8 @@ RUN apt-get update \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1
 
+RUN apt-get update \
+	&& apt-get install -y vim
 	
 # Add Microsoft repo for Microsoft ODBC Driver 17 for Linux
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
