@@ -19,7 +19,7 @@ services:
     # mount the app directory of the host to /var/www in the container
     # corresponds to the "-v" option
     volumes:
-      - ./app:/var/www
+      - ../web:/var/www
     # connect to the network
     # corresponds to the "--network" option
     networks:
@@ -31,9 +31,21 @@ services:
     # corresponds to the "-p" flag
     ports:
       - "8080:80"
+      # 投等倉
+      - "81:81"
+      # OM
+      - "82:82"
+      # 簽呈系統
+      - "83:83"
+      # API中心
+      - "84:84"
+      # 財務系統
+      - "85:85"
+      # 模板
+      - "99:99"
     tty: true
     volumes:
-      - ./app:/var/www
+      - ../web:/var/www
       - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
       - web-network
@@ -42,7 +54,7 @@ services:
       context: ./php-fpm
     tty: true
     volumes:
-      - ./app:/var/www
+      - ../web:/var/www
       - ./php-fpm/openssl.cnf:/etc/ssl/openssl.cnf
     networks:
       - web-network
