@@ -31,6 +31,7 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1
+	&& pecl install mcrypt-1.0.1
 
 RUN npm install apidoc@0.17.6 -g
 
@@ -59,6 +60,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 	
 # Install required extensions
 RUN pecl install apcu-5.1.5 pdo_sqlsrv-5.8.1 sqlsrv-5.8.1 
+RUN docker-php-ext-enable mcrypt
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-enable sqlsrv
 RUN docker-php-ext-enable pdo_sqlsrv
