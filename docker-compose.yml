@@ -47,6 +47,7 @@ services:
       - "99:99"
     tty: true
     volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ../web:/var/www
       - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
