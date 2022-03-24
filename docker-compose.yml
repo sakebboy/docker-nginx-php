@@ -68,9 +68,11 @@ services:
       context: ./mysql
     volumes:
       - ~/mysql-docker-data:/var/lib/mysql
+    ports:
+      - 3306:3306
     environment:
+      TZ: Asia/Taipei
       MYSQL_ROOT_PASSWORD: Aa123456
       MYSQL_DATABASE: mydb
-    ports:
-      - "3306:3306"
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     
