@@ -30,7 +30,9 @@ RUN apt-get update \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
-	&& pecl install redis-4.0.1 \
+	&& pecl install redis-4.0.1 
+	
+RUN apt-get update \
 	&& pecl install mcrypt-1.0.1
 
 RUN npm install apidoc@0.17.6 -g
