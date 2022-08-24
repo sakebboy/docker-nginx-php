@@ -114,3 +114,18 @@ RUN echo 'instantclient,/opt/oracle/instantclient_12_1/' | pecl install oci8-2.2
                pdo_oci 
 
 
+# Install SAP extensions
+ADD sap/nwrfcsdk /usr/sap/nwrfcsdk
+RUN echo /usr/sap/nwrfcsdk/lib > /etc/ld.so.conf.d/nwrfcsdk.conf
+RUN ldconfig
+
+# Install PHP SAP SDK
+ADD sap/php7-sapnwrfc /home/php7-sapnwrfc
+WORKDIR /home/php7-sapnwrfc
+RUN phpize
+RUN ./configure --with-php-config=/usr/local/bin/php-config
+RUN make \
+	&& make install
+
+
+
