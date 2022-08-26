@@ -32,7 +32,7 @@ public:
 private:
 	void parseCommandFile(const SAP_UC* filePath);
 
-        std::vector<RFC_CONNECTION_PARAMETER> connectionParams;
+	RFC_CONNECTION_PARAMETER* connectionParams;
 	RFC_CONNECTION_HANDLE connection;
 	SAP_UC system[9];
 	bool registered;

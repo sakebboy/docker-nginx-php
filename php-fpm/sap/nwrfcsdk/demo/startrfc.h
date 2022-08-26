@@ -15,7 +15,7 @@ typedef struct _options
     SAP_UC const * function;
     SAP_UC const * path;
     SAP_UC const * port;
-    SAP_UC const * trace;
+    unsigned       trace;
     bool           showSysInfo; 
 }OPTIONS;
 

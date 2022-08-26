@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <errno.h>
 #include <time.h>
-#include <algorithm>
 
 
 #ifdef SAPonNT
@@ -74,18 +73,6 @@ RFC_FUNCTION_DESC_HANDLE RfcExecServer::rfc_exec;
 RFC_FUNCTION_DESC_HANDLE RfcExecServer::rfc_pipe;
 
 RfcExecServer* theServer = NULL;
-
-class StrCmp
-{
-public:
-    StrCmp(SAP_UC* str1) : str1(str1) {}
-    bool operator()(const SAP_UC* str2)
-    {
-        return strcmpU(str1, str2) == 0;
-    }
-private:
-    SAP_UC* str1;
-};
 
 /**
  * \brief  Callback function for the RFC SDK.
@@ -239,44 +226,26 @@ RFC_RC RfcExecServer::handleRequest(RFC_CONNECTION_HANDLE rfcHandle, RFC_FUNCTIO
 	}
 	else trace(cU("Process started successfully"), NULL, 1);
 
-	RFC_TABLE_HANDLE pipedata;
+	if (*readPipe == cU('X')){
+		RFC_TABLE_HANDLE pipedata;
 
-	rc = RfcGetTable(funcHandle, cU("PIPEDATA"), &pipedata, errorInfo);
-	if (rc != RFC_OK){
-		trace(cU("Getting PIPEDATA table failed"), errorInfo->message, 1);
-		rc = RFC_EXTERNAL_FAILURE;
-		goto cleanup;
-	}
-
-	while(fgetsU(command, 80, pipe)){
-		if (*readPipe != cU('X'))
-			continue;
-
-		RfcAppendNewRow(pipedata, errorInfo);
-		if (errorInfo->code != RFC_OK){
+		rc = RfcGetTable(funcHandle, cU("PIPEDATA"), &pipedata, errorInfo);
+		if (rc != RFC_OK){
+			trace(cU("Getting PIPEDATA table failed"), errorInfo->message, 1);
 			rc = RFC_EXTERNAL_FAILURE;
 			goto cleanup;
 		}
-
-		// remove newline and tabs from the end
-		size_t str_len = strlenU(command);
-		if (command[str_len-2] == cU('\r') && command[str_len-1] == cU('\n'))
-			str_len -= 2;
-		else if (command[str_len-1] == cU('\n') || command[str_len-1] == cU('\t') || command[str_len-1] == cU('\r'))
-			--str_len;
-
-		// replace tab by a space (may occur in the middle of the line, e.g. with the command "dir" on UNIX)
-		SAP_UC* current_pos = strchrU(command, cU('\t'));
-		while (current_pos)
-		{
-			*current_pos = cU(' ');
-			current_pos = strchrU(current_pos, cU('\t'));
-		}
-
-		RfcSetChars(pipedata, cU("PIPEDATA"), command, str_len, errorInfo);
-		if (errorInfo->code != RFC_OK){
-			rc = RFC_EXTERNAL_FAILURE;
-			goto cleanup;
+		while(fgetsU(command, 80, pipe)){
+			RfcAppendNewRow(pipedata, errorInfo);
+			if (errorInfo->code != RFC_OK){
+				rc = RFC_EXTERNAL_FAILURE;
+				goto cleanup;
+			}
+			RfcSetChars(pipedata, cU("PIPEDATA"), command, strlenU(command), errorInfo);
+			if (errorInfo->code != RFC_OK){
+				rc = RFC_EXTERNAL_FAILURE;
+				goto cleanup;
+			}
 		}
 	}
 
@@ -378,45 +347,13 @@ int mainU (int argc, SAP_UC** argv){
  * \in argc See mainU
  * \in **argv See mainU
  */
-RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
-    running(true),
-    connection(NULL),
-    secureMode(false),
-    traceFile(NULL),
-    backendRequestedTrace(false)
-{
+RfcExecServer::RfcExecServer(int argc, SAP_UC** argv)
+:running(true), connectionParams(NULL), connection(NULL), secureMode(false), traceFile(NULL), backendRequestedTrace(false){
+	int i;
 	RFC_ERROR_INFO errorInfo;
-        SAP_UC error[256] = iU("");
+    SAP_UC error[256] = iU("");
 
 	memsetU(system, cU('\0'), sizeofU(system));
-
-	std::vector<const SAP_UC*> additionalParams(5);
-	additionalParams[0] = cU("-on_cce");
-	additionalParams[1] = cU("-cfit");
-	additionalParams[2] = cU("-keepalive");
-	additionalParams[3] = cU("-delta");
-	additionalParams[4] = cU("-no_compression");
-
-	for (int i = 1; i < argc; ++i){
-		RFC_CONNECTION_PARAMETER param;
-
-		std::vector<const SAP_UC*>::const_iterator found_it =
-			std::find_if(additionalParams.begin(), additionalParams.end(), StrCmp(argv[i]));
-
-		if (found_it == additionalParams.end())
-			continue;
-		else
-			param.name = *found_it + 1; // +1 to get rid of the "-" char
-
-		if (i == argc-1){
-			/*CCQ_SECURE_LIB_OK*/
-			sprintfU(error, cU("Missing value for parameter %s"), argv[i]);
-			goto cleanup;
-		}
-
-		param.value = argv[++i];
-		connectionParams.push_back(param);
-	}
 
 	if (	argc > 4 &&
 			(!strncmpU(argv[2],cU("sapgw"),5) || !strncmpU(argv[2],cU("33"),2) || !strncmpU(argv[2],cU("48"),2)) &&
@@ -431,25 +368,19 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 			isdigitU(argv[3][7])
 		){ //Started Server
 		registered = false;
-
-		for (int i=2; i<argc; i++){
-			if (!strncmpU(argv[i], cU("-t"), 2) ||
-			    (!strncmpU(argv[i], cU("CPIC_TRACE="), 11) && argv[i][11] > cU('0'))){
-				openTrace();
-			}
-		}
-
+		for (i=2; i<argc; i++) if (!strncmpU(argv[i], cU("-t"), 2)
+					|| (!strncmpU(argv[i], cU("CPIC_TRACE="), 11) && argv[i][11] > cU('0'))) openTrace();
 		parseCommandFile(cU("rfcexec.sec"));
-		connection = RfcStartServer(argc, argv, &connectionParams[0], connectionParams.size(), &errorInfo);
+		connection = RfcStartServer(argc, argv, NULL, 0, &errorInfo);
 		if (connection == NULL) goto cleanup;
 	}
 	else{ //Registered Server
-		unsigned flags = 0;
-                RFC_CONNECTION_PARAMETER param;
+		unsigned paramCount = 0, flags = 0;
 
 		registered = true;
+		connectionParams = new RFC_CONNECTION_PARAMETER[3];
 
-		for (int i=1; i<argc; i++){
+		for (i=1; i<argc; i++){
 			if (!strcmpU(cU("-a"), argv[i])){
 				if ((flags & 1) == 1){
 					/*CCQ_SECURE_LIB_OK*/
@@ -457,7 +388,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 					goto cleanup;
 				}
 				flags |= 1;
-				param.name = cU("program_id");
+				connectionParams[paramCount].name = cU("program_id");
 			}
 			else if (!strcmpU(cU("-g"), argv[i])){
 				if ((flags & 2) == 2){
@@ -466,7 +397,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 					goto cleanup;
 				}
 				flags |= 2;
-				param.name = cU("gwhost");
+				connectionParams[paramCount].name = cU("gwhost");
 			}
 			else if (!strcmpU(cU("-x"), argv[i])){
 				if ((flags & 4) == 4){
@@ -475,7 +406,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 					goto cleanup;
 				}
 				flags |= 4;
-				param.name = cU("gwserv");
+				connectionParams[paramCount].name = cU("gwserv");
 			}
 			else if (!strcmpU(cU("-t"), argv[i])){
 				openTrace();
@@ -512,12 +443,10 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 				strncpyU(system, argv[++i], 8);
 				continue;
 			}
-			else if (std::find_if(additionalParams.begin(), additionalParams.end(), StrCmp(argv[i])) == additionalParams.end()){
+			else{
 				/*CCQ_SECURE_LIB_OK*/
-				if (traceFile)
-					fprintfU(traceFile, cU("Unknown parameter: %s\n"), argv[i]); 
-				printfU(cU("Unknown parameter: %s\n"), argv[i]); 
-				continue;
+				sprintfU(error, cU("Unknown parameter: %s"), argv[i]); 
+				goto cleanup;
 			}
 
 			if (i == argc-1){
@@ -526,8 +455,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 				goto cleanup;
 			}
 
-			param.value = argv[++i];
-                        connectionParams.push_back(param);
+			connectionParams[paramCount++].value = argv[++i];
 		}
 
 		if ((flags & 7) != 7){
@@ -536,7 +464,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
 			goto cleanup;
 		}
 
-		connection = RfcRegisterServer(&connectionParams[0], connectionParams.size(), &errorInfo);
+		connection = RfcRegisterServer(connectionParams, paramCount, &errorInfo);
 		if (connection == NULL) goto cleanup;
 	}
 
@@ -563,6 +491,7 @@ RfcExecServer::RfcExecServer(int argc, SAP_UC** argv) :
  */
 RfcExecServer::~RfcExecServer(void){
 	if (connection) RfcCloseConnection(connection, NULL);
+	if (connectionParams) delete[] connectionParams;
 	closeTrace();
 
 	vector<SAP_UC*>::iterator it = allowed.begin();
@@ -586,14 +515,7 @@ void RfcExecServer::usage(SAP_UC* param){
 	if (param) printfU(cU("Error: %s\n"), param);
 	printfU(cU("\tPlease start the program in the following way:\n"));
 	printfU(cU("\trfcexec -t -a <program ID> -g <gateway host> -x <gateway service>\n\t\t-f <file with list of allowed commands> -s <allowed Sys ID>\n"));
-	printfU(cU("The options \"-t\" (trace), \"-f\" and \"-s\" are optional.\n\n"));
-	printfU(cU("Below further optional parameters are listed. You can find their\n"));
-	printfU(cU("documentation in sapnwrfc.ini:\n"));
-        printfU(cU("-on_cce <0, 1, 2> (On Character Conversion Error)\n"));
-        printfU(cU("-cfit (Conversion Fault Indicator Token - the substitute symbol used if on_cce=2)\n"));
-        printfU(cU("-keepalive (Sets the keepalive option. Default is 0.)\n"));
-        printfU(cU("-delta <0, 1> (default 1, i.e. use delta-manager)\n"));
-        printfU(cU("-no_compression (table compression, default is 0, i.e. compression is on)\n"));
+	printfU(cU("The options \"-t\" (trace), \"-f\" and \"-s\" are optional.\n"));
 }
 
 /**
@@ -646,7 +568,7 @@ void RfcExecServer::run(void){
 
 		if (refresh && registered){
 			trace(cU("Trying to reconnect..."), NULL);
-			connection = RfcRegisterServer(&connectionParams[0], connectionParams.size(), &errorInfo);
+			connection = RfcRegisterServer(connectionParams, 3, &errorInfo);
 			if (connection == NULL){
 				printfU(cU("Error: unable to reconnect to %s. %s:%s\n"), system,
 						RfcGetRcAsString(errorInfo.code), errorInfo.message);

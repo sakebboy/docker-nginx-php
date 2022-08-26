@@ -38,7 +38,12 @@ bool parseCommand(int argc, SAP_UC ** argv, OPTIONS* options)
         const SAP_UC ch2 = argv[i++][1];
         if(ch1 == cU('-') && ch2) // we found an option
         {
-            if(ch2 == cU('i'))
+            if(ch2 == cU('t'))
+            {
+                options->trace = 1;
+                continue;
+            }
+            else if(ch2 == cU('i'))
             {
                 options->showSysInfo = true;
                 continue;
@@ -85,9 +90,6 @@ bool parseCommand(int argc, SAP_UC ** argv, OPTIONS* options)
                         options->port = param + PORT_LEN;
                     }
                 }
-                break;
-			case cU('t'):
-                options->trace = argv[i++];
                 break;
             default:
                 i++;
@@ -170,8 +172,7 @@ RFC_RC startRfc(OPTIONS *options)
                                 {cU("lang"), options->language ? options->language : cU("E")},
                                 {cU("user"), options->user},
                                 {cU("passwd"), options->passwd},
-                                {cU("dest"), options->dest ? options->dest : cU("")},
-								{cU("trace"), options->trace}};
+                                {cU("dest"), options->dest ? options->dest : cU("")}};
     RFC_CONNECTION_HANDLE connHandle = RfcOpenConnection(connParams, 
                                         sizeofR(connParams) / sizeofR(RFC_CONNECTION_PARAMETER),
                                         &error);
@@ -232,11 +233,10 @@ void showHelp( )
     printfU( cU("                       file, with maximum length of 100 charachters\n") );
     printfU( cU("  -E PORT=<port name>  port name of the ALE/EDI interface with maximum   \n") );
     printfU( cU("                       length of 10 charachters\n") );
-    printfU( cU("  -t <level>           set RFC tracelevel 0(off), 1(brief), 2(verbose) or 3(full)\n") );
+    printfU( cU("  -t                   enable RFC trace\n") );
     printfU( cU("  -help  or -?         display this help page\n") );
-    printfU( cU("  -v                   display the version of the NWRFC library, the version\n") );
-    printfU( cU("                       of the compiler used by SAP to build this program and\n") );
-	printfU( cU("                       the version of startrfc\n") );
+    printfU( cU("  -v                   display the version of the NWRFC library and the version\n") );
+    printfU( cU("                       of the compiler used by SAP to build this program\n") );
     printfU( cU("  -i                   connect to the target system and display the system info\n") );
 
 }
@@ -295,6 +295,6 @@ void showVersion()
 		cU("%s\n"), cU("Version not available.")
 #endif
 	);
-    printfU (cU("Startrfc Version: 2018-08-15\n"));
+
 }
 

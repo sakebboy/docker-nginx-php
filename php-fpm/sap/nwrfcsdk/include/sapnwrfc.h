@@ -255,7 +255,7 @@ typedef struct _RFC_SECURITY_ATTRIBUTES
 	SAP_UC *client;			///< ABAP Client ("Mandant")
 	SAP_UC *user;			///< ABAP User
 	SAP_UC *progName;		///< Name of the calling APAB program (report, module pool)
-	SAP_UC *sncName;		///< SNC name of the calling ABAP system, if SNC is enabled
+	SAP_UC *sncName;		///< SNC key of the calling ABAP system, if SNC is enabled
 	SAP_UC *ssoTicket;		///< Logon ticket of the ABAP user, if SSO2 or assertion tickets are enabled
 }RFC_SECURITY_ATTRIBUTES, *P_RFC_SECURITY_ATTRIBUTES;
 
@@ -591,8 +591,8 @@ extern "C"
 	 * \brief  Get information about currently loaded sapnwrfc library.
 	 * \ingroup general
 	 *
-	 * Fills the provided unsigneds with the SAP release values, e.g. *majorVersion = 7210,
-	 * *minorVersion = 0, *patchLevel = 42.
+	 * Fills the provided unsigneds with the SAP release values, e.g. *majorVersion = 7,
+	 * *minorVersion = 10, *patchLevel = 42.
 	 * \out *majorVersion 
 	 * \out *minorVersion 
 	 * \out *patchLevel 
@@ -768,16 +768,6 @@ extern "C"
 	DECL_EXP RFC_RC SAP_API RfcSetCpicTraceLevel(unsigned traceLevel, RFC_ERROR_INFO* errorInfo);
 
 
-    /**
-     * \brief Activates the CPIC keepalive 
-     *
-     * \in timeout Must be a value between 10 and 3600, where 0 turns the cpic keepalive off.
-	 * \out *errorInfo Detail information in case of an error.
-	 * \return RFC_RC
-	 */
-	DECL_EXP RFC_RC SAP_API RfcSetCpicKeepalive(unsigned timeout, RFC_ERROR_INFO* errorInfo);
-
-
 	/**
      * \brief  Converts data in UTF-8 format to SAP_UC strings.
      * \ingroup general
@@ -890,7 +880,7 @@ extern "C"
 	 * When logging on with SNC, user&passwd are to be replaced by
 	 * - snc_qop, snc_myname, snc_partnername and optionally snc_lib.
 	 *
-	 * (If snc_lib is not specified, the underlying SNC layer uses the "global" GSS library
+	 * (If snc_lib is not specified, the RFC library uses the "global" GSS library
 	 * defined via environment variable SNC_LIB.)
 	 *
 	 * When logging on with SSO Ticket, you can use mysapsso2 instead of user&passwd.
@@ -1666,10 +1656,7 @@ extern "C"
 	 * the password. In that case RfcOpenConnection() will end with RFC_LOGON_FAILURE and any additional text from
 	 * errorInfo->message will be returned to the application. Or you can fill the old and new password with correct
 	 * values and return RFC_OK, upon which the RFC library will attempt to change the password accordingly.
-	 * \note See also the documentation of the logon parameter PASSWORD_CHANGE_ENFORCED in the sample sapnwrfc.ini file,
-	 * which specifies, whether the application is allowed to get by without a PasswordChangeHandler and keep using
-	 * the initial/expired password for login.
-	 *
+	 * 
 	 * 
 	 * \in onPasswordChange Pointer to a function of type RFC_ON_PASSWORD_CHANGE. The RFC lib calls this function, whenever an initial password is detected during a call to RfcOpenConnection().
 	 * \out *errorInfo Additional information, in case the handler could not be installed.
@@ -3766,7 +3753,7 @@ extern "C"
 	 * \brief  Removes a class description from the cache for the specified R/3 System.
 	 * \ingroup repository
      * 
-     * If repositoryID is NULL, the description is removed from the "default repository".
+     * If repositoryID is NULL, the description is added to the "default repository".
 	 * 
 	 * 
 	 * \in *repositoryID System ID of R/3 System, from whose cache you want to remove the class description,
@@ -3831,7 +3818,7 @@ extern "C"
 	 * complex structures are referenced by an 8-byte pointer, etc. In general you will need
 	 * to do a bit of trial and error, before you get it right.\n
 	 * If you really need more details/tips for the process of hardcoding metadata, see
-	 * <A HREF="https://wiki.scn.sap.com/wiki/x/FD67Gg">this article</A>.
+	 * <A HREF="https://scn.sap.com/docs/DOC-52888">this article</A>.
 	 * 
      * 
      * \in typeHandle The type description.

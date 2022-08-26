@@ -1,4 +1,4 @@
-/* @(#) $Id: //bas/721_REL/src/include/sapdecf.h#3 $ SAP*/
+/* @(#) $Id: //bas/721_REL/src/include/sapdecf.h#1 $ SAP*/
 /*-----------------------------------------------------------------------------
  *
  * (c) Copyright SAP AG, Walldorf 
@@ -30,58 +30,6 @@
 
 #ifndef SAPDECF_H
 #define SAPDECF_H
-
-/* @type SAP_API |
- * The token SAP_API contains plattform dependent keywords,
- * which are necessary to allow dynamic linking of these function
- * from various environments. On Windows for example SAP_API is
- * __extern __loadds __pascal __far.
- */
-
-#if !defined(SAP_FAR)|| !defined(SAP_PASCAL)|| !defined(SAP_EXPORT)|| !defined(SAP_LOADDS) || !defined(SAP_STDCALL)
-#   undef SAP_FAR
-#   undef SAP_PASCAL
-#   undef SAP_EXPORT
-#   undef SAP_LOADDS
-#   undef SAP_STDCALL
-#   if defined(SAPonWINDOWS)
-#       define SAP_FAR __far
-#       define SAP_PASCAL __pascal
-#       define SAP_EXPORT __export
-#       define SAP_LOADDS __loadds
-#       define SAP_STDCALL
-#   elif defined(SAPonNT)
-#       define SAP_FAR
-#       define SAP_PASCAL
-#       define SAP_EXPORT
-#       define SAP_LOADDS
-#       define SAP_STDCALL _stdcall
-#   else
-#       define SAP_FAR
-#       define SAP_PASCAL
-#       define SAP_EXPORT
-#       define SAP_LOADDS
-#       define SAP_STDCALL
-#   endif
-#endif
-
-#if !defined(SAP_API)
-#   if defined(OS2)
-#       define _SYSTEM _System
-#       define SAP_API _SYSTEM
-#   else
-#       define _SYSTEM
-#       define SAP_API SAP_FAR SAP_LOADDS SAP_PASCAL SAP_STDCALL
-#   endif
-#endif /* SAP_API */
-
-#ifndef DECL_EXP
-#   if defined(SAPonLIN) && defined(__GNUC__) && defined(GCC_HIDDEN_VISIBILITY)
-#     define DECL_EXP __attribute__((visibility("default")))
-#   else
-#     define DECL_EXP
-#   endif
-#endif
 
 /**
  *brief Error return codes.
@@ -164,7 +112,7 @@ void decf_mutex_unlock(void);
 * @return DECF_NOT_SUPPORTED  --  Shared library could not be loaded
 * @return DECF_WRONG_VERSION  --  Shared library has wrong version (check dev-traces)
 */
-DECL_EXP DECF_RETURN SAP_API InitDecFloatLib(void); 
+DECF_RETURN InitDecFloatLib(void); 
 
 /* DecFloat <-> String conversions */
 /**
@@ -177,7 +125,7 @@ DECL_EXP DECF_RETURN SAP_API InitDecFloatLib(void);
  * @param  dfp16    A pointer to a 64-bit IEEE 754r variable
  * @return DECF_OK              -- Fine
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToString(DecFloat16  dfp16, DecFloat16Buff* numstr);
+DECF_RETURN DecFloat16ToString(DecFloat16  dfp16, DecFloat16Buff* numstr);
 
 /**
  * \brief Convert DecFloat34 into numeric String.
@@ -189,7 +137,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16ToString(DecFloat16  dfp16, DecFloat16Buf
  * @param  dfp34    A pointer to a 128-bit IEEE 754r variable
  * @return DECF_OK              -- Fine
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToString(DecFloat34  dfp34, DecFloat34Buff* numstr);
+DECF_RETURN DecFloat34ToString(DecFloat34  dfp34, DecFloat34Buff* numstr);
 
 /**
  * \brief Convert numeric String into Decfloat16.
@@ -204,7 +152,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToString(DecFloat34  dfp34, DecFloat34Buf
  * @return DECF_CONV_SYNTAX     -- Numeric string conatins non-numeric characters (f.g. spaces)
  * @return DECF_NO_MEMORY       -- A memoy allocation error occured       
  */
-DECL_EXP DECF_RETURN SAP_API StringToDecFloat16(const SAP_UC* numstr, DecFloat16*  dfp16);
+DECF_RETURN StringToDecFloat16(const SAP_UC* numstr, DecFloat16*  dfp16);
 
 /**
  * \brief Convert numeric String into a Decfloat34 variable.
@@ -219,11 +167,11 @@ DECL_EXP DECF_RETURN SAP_API StringToDecFloat16(const SAP_UC* numstr, DecFloat16
  * @return DECF_CONV_SYNTAX     -- Numeric string conatins non-numeric characters (f.g. spaces)
  * @return DECF_NO_MEMORY       -- A memoy allocation error occured       
  */
-DECL_EXP DECF_RETURN SAP_API StringToDecFloat34(const SAP_UC* numstr, DecFloat34*  dfp34); 
+DECF_RETURN StringToDecFloat34(const SAP_UC* numstr, DecFloat34*  dfp34); 
 
 /* DecFloat <-> DecFloat conversion */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat34(DecFloat34*  dfp34_res, DecFloat16  dfp16);
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat16(DecFloat16*  dfp16_res, DecFloat34  dfp34);
+DECF_RETURN DecFloat16ToDecFloat34(DecFloat34*  dfp34_res, DecFloat16  dfp16);
+DECF_RETURN DecFloat34ToDecFloat16(DecFloat16*  dfp16_res, DecFloat34  dfp34);
 
 /* DecFloat <-> binary sortable DecFloat conversion */
 /**
@@ -239,7 +187,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat16(DecFloat16*  dfp16_res, DecF
  * @return DECF_OK         -- Fine 
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16raw_res, SAP_SHORT* scale, DecFloat16  dfp16);
+DECF_RETURN DecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16raw_res, SAP_SHORT* scale, DecFloat16  dfp16);
 
 /**
  * \brief Convert 8 byte binary sortable format into 64-bit IEEE 754r decimal floating point variable.
@@ -256,7 +204,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16raw_r
  * @return DECF_NO_MEMORY  -- A memoy allocation error occured      
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16RawToDecFloat16(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw, SAP_SHORT scale);
+DECF_RETURN DecFloat16RawToDecFloat16(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw, SAP_SHORT scale);
 
 /**
  * \brief Convert 128-bit IEEE 754r decimal floating point variable to 16 byte binary sortable format and store scale information.
@@ -272,7 +220,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16RawToDecFloat16(DecFloat16*  dfp16_res, D
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured      
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34raw_res, SAP_SHORT* scale, DecFloat34  dfp34);
+DECF_RETURN DecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34raw_res, SAP_SHORT* scale, DecFloat34  dfp34);
 
 /**
  * \brief Convert 16 byte binary sortable format into 128-bit IEEE 754r decimal floating point variable.
@@ -289,7 +237,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34raw_r
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured    
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34RawToDecFloat34(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw, SAP_SHORT scale);
+DECF_RETURN DecFloat34RawToDecFloat34(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw, SAP_SHORT scale);
 
 
 /**
@@ -306,7 +254,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34RawToDecFloat34(DecFloat34*  dfp34_res, D
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured    
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16RawDB(DecFloat16Raw* dfp16raw_res, SAP_SHORT* scale, DecFloat16  dfp16); 
+DECF_RETURN DecFloat16ToDecFloat16RawDB(DecFloat16Raw* dfp16raw_res, SAP_SHORT* scale, DecFloat16  dfp16); 
 
 /**
  * \brief Convert 8 byte binary sortable format into 64-bit IEEE 754r decimal floating point variable.
@@ -323,7 +271,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16RawDB(DecFloat16Raw* dfp16raw
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured    
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16RawToDecFloat16DB(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw, SAP_SHORT scale); 
+DECF_RETURN DecFloat16RawToDecFloat16DB(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw, SAP_SHORT scale); 
 
 /**
  * \brief Convert 128-bit IEEE 754r decimal floating point variable to 16 byte binary sortable format and store scale information.
@@ -339,7 +287,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16RawToDecFloat16DB(DecFloat16*  dfp16_res,
  * @return DECF_NO_MEMORY  -- A memoy allocation error occured    
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34RawDB(DecFloat34Raw* dfp34raw_res, SAP_SHORT* scale, DecFloat34  dfp34);
+DECF_RETURN DecFloat34ToDecFloat34RawDB(DecFloat34Raw* dfp34raw_res, SAP_SHORT* scale, DecFloat34  dfp34);
 
 /**
  * \brief Convert 16 byte binary sortable format into 128-bit IEEE 754r decimal floating point variable.
@@ -356,7 +304,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34RawDB(DecFloat34Raw* dfp34raw
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured    
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34RawToDecFloat34DB(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw, SAP_SHORT scale); 
+DECF_RETURN DecFloat34RawToDecFloat34DB(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw, SAP_SHORT scale); 
 
 /**
  * \brief Convert 64-bit IEEE 754r decimal floating point variable to 8 byte binary sortable format without scale information.
@@ -370,7 +318,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34RawToDecFloat34DB(DecFloat34*  dfp34_res,
  * @return DECF_OK         -- Fine 
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API NormDecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16raw_res, DecFloat16  dfp16);
+DECF_RETURN NormDecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16raw_res, DecFloat16  dfp16);
 
 /**
  * \brief Convert 8 byte binary sortable format into 64-bit IEEE 754r decimal floating point variable.
@@ -385,7 +333,7 @@ DECL_EXP DECF_RETURN SAP_API NormDecFloat16ToDecFloat16Raw(DecFloat16Raw* dfp16r
  * @return DECF_NO_MEMORY  -- A memoy allocation error occured      
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16RawToNormDecFloat16(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw);
+DECF_RETURN DecFloat16RawToNormDecFloat16(DecFloat16*  dfp16_res, DecFloat16Raw dfp16raw);
 
 /**
  * \brief Convert 128-bit IEEE 754r decimal floating point variable to 16 byte binary sortable format without scale information.
@@ -399,7 +347,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16RawToNormDecFloat16(DecFloat16*  dfp16_re
  * @return DECF_OK         -- Fine 
  * @return DECF_INVALID_OP -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API NormDecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34raw_res, DecFloat34  dfp34);
+DECF_RETURN NormDecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34raw_res, DecFloat34  dfp34);
 
 /**
  * \brief Convert 16 byte binary sortable format into 128-bit IEEE 754r decimal floating point variable.
@@ -414,21 +362,21 @@ DECL_EXP DECF_RETURN SAP_API NormDecFloat34ToDecFloat34Raw(DecFloat34Raw* dfp34r
  * @return DECF_NO_MEMORY   -- A memoy allocation error occured    
  * @return DECF_INVALID_OP  -- Some internal errors
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34RawToNormDecFloat34(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw);
+DECF_RETURN DecFloat34RawToNormDecFloat34(DecFloat34*  dfp34_res, DecFloat34Raw dfp34raw);
 
 /* DecFloat <-> Integer conversion */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToSAP_INT(SAP_INT* i, DecFloat16  dfp16);
-DECL_EXP DECF_RETURN SAP_API SAP_INTToDecFloat16(DecFloat16*  dfp16_res, SAP_INT i);
+DECF_RETURN DecFloat16ToSAP_INT(SAP_INT* i, DecFloat16  dfp16);
+DECF_RETURN SAP_INTToDecFloat16(DecFloat16*  dfp16_res, SAP_INT i);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToSAP_INT(SAP_INT* i, DecFloat34  dfp34);
-DECL_EXP DECF_RETURN SAP_API SAP_INTToDecFloat34(DecFloat34*  dfp34_res, SAP_INT i);
+DECF_RETURN DecFloat34ToSAP_INT(SAP_INT* i, DecFloat34  dfp34);
+DECF_RETURN SAP_INTToDecFloat34(DecFloat34*  dfp34_res, SAP_INT i);
 
 /* DecFloat <-> Double conversion */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToSAP_DOUBLE(SAP_DOUBLE* d, DecFloat16  dfp16);
-DECL_EXP DECF_RETURN SAP_API SAP_DOUBLEToDecFloat16(DecFloat16*  dfp16_res, SAP_DOUBLE i);
+DECF_RETURN DecFloat16ToSAP_DOUBLE(SAP_DOUBLE* d, DecFloat16  dfp16);
+DECF_RETURN SAP_DOUBLEToDecFloat16(DecFloat16*  dfp16_res, SAP_DOUBLE i);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToSAP_DOUBLE(SAP_DOUBLE* d, DecFloat34  dfp34);
-DECL_EXP DECF_RETURN SAP_API SAP_DOUBLEToDecFloat34(DecFloat34*  dfp34_res, SAP_DOUBLE i);
+DECF_RETURN DecFloat34ToSAP_DOUBLE(SAP_DOUBLE* d, DecFloat34  dfp34);
+DECF_RETURN SAP_DOUBLEToDecFloat34(DecFloat34*  dfp34_res, SAP_DOUBLE i);
 
 
 /* DecFloat <-> BCD conversion */
@@ -454,7 +402,7 @@ DECL_EXP DECF_RETURN SAP_API SAP_DOUBLEToDecFloat34(DecFloat34*  dfp34_res, SAP_
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN  SAP_API DecFloat16ToBCD(SAP_RAW* bcd_res, DecFloat16 dfp16, intR length, intR decPlaces);
+DECF_RETURN  DecFloat16ToBCD(SAP_RAW* bcd_res, DecFloat16 dfp16, intR length, intR decPlaces);
 
 /**
  * \brief Round IEEE value such that it fits into ABAP type P (BCD).
@@ -479,7 +427,7 @@ DECL_EXP DECF_RETURN  SAP_API DecFloat16ToBCD(SAP_RAW* bcd_res, DecFloat16 dfp16
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN  SAP_API DecFloat16RoundForDEC(DecFloat16* dfp16, intR length, intR decPlaces);
+DECF_RETURN  DecFloat16RoundForDEC(DecFloat16* dfp16, intR length, intR decPlaces);
 
 /**
  * \brief Compare an IEEE value with a DF16_DEC value.
@@ -506,7 +454,7 @@ DECL_EXP DECF_RETURN  SAP_API DecFloat16RoundForDEC(DecFloat16* dfp16, intR leng
  *                      If p_rc is DECF_INVALID_OP,
  *                      the return value is guaranteed to be non-zero.
  */
-DECL_EXP SAP_INT SAP_API DecFloat16CompareForDEC(DecFloat16 unroundedDf,
+SAP_INT DecFloat16CompareForDEC(DecFloat16 unroundedDf,
                                 DecFloat16 roundedDf, 
                                 intR decPlaces,
                                 DECF_RETURN* p_rc);
@@ -530,7 +478,7 @@ DECL_EXP SAP_INT SAP_API DecFloat16CompareForDEC(DecFloat16 unroundedDf,
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN  SAP_API BCDToDecFloat16(DecFloat16* dfp16_res, SAP_RAW*  bcd, intR length, intR decPlaces );
+DECF_RETURN  BCDToDecFloat16(DecFloat16* dfp16_res, SAP_RAW*  bcd, intR length, intR decPlaces );
 
 
 /**
@@ -555,7 +503,7 @@ DECL_EXP DECF_RETURN  SAP_API BCDToDecFloat16(DecFloat16* dfp16_res, SAP_RAW*  b
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToBCD(SAP_RAW* bcd_res, DecFloat34 dfp34, intR length, intR decPlaces);
+DECF_RETURN DecFloat34ToBCD(SAP_RAW* bcd_res, DecFloat34 dfp34, intR length, intR decPlaces);
 
 /**
  * \brief Round IEEE value such that it fits into ABAP type P (BCD).
@@ -578,7 +526,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToBCD(SAP_RAW* bcd_res, DecFloat34 dfp34,
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN  SAP_API DecFloat34RoundForDEC(DecFloat34* dfp34, intR length, intR decPlaces);
+DECF_RETURN  DecFloat34RoundForDEC(DecFloat34* dfp34, intR length, intR decPlaces);
 
 /**
  * \brief Compare an IEEE value with a DF34_DEC value.
@@ -605,7 +553,7 @@ DECL_EXP DECF_RETURN  SAP_API DecFloat34RoundForDEC(DecFloat34* dfp34, intR leng
  *                      If p_rc is DECF_OVERFLOW or DECF_INVALID_OP,
  *                      the return value is guaranteed to be non-zero.
  */
-DECL_EXP SAP_INT SAP_API DecFloat34CompareForDEC(DecFloat34 unroundedDf,
+SAP_INT DecFloat34CompareForDEC(DecFloat34 unroundedDf,
                                 DecFloat34 roundedDf, 
                                 intR decPlaces,
                                 DECF_RETURN* p_rc);
@@ -628,7 +576,7 @@ DECL_EXP SAP_INT SAP_API DecFloat34CompareForDEC(DecFloat34 unroundedDf,
  * @return DECF_NO_MEMORY   The caller should abort.
  * @return DECF_INVALID_OP  Garbage input. The caller should abort.
  */
-DECL_EXP DECF_RETURN SAP_API BCDToDecFloat34(DecFloat34* dfp34_res, SAP_RAW* bcd, intR length, intR decPlaces );
+DECF_RETURN BCDToDecFloat34(DecFloat34* dfp34_res, SAP_RAW* bcd, intR length, intR decPlaces );
 
 
 
@@ -647,7 +595,7 @@ DECL_EXP DECF_RETURN SAP_API BCDToDecFloat34(DecFloat34* dfp34_res, SAP_RAW* bcd
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Add(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat16_Add(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
 
 /**
  * \brief Computes the sum of two DecFloat34 numbers. 
@@ -662,7 +610,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Add(DecFloat16* dfp16_res, DecFloat16  d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Add(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat34_Add(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
 /**
  * \brief Computes the difference of two DecFloat16 numbers. 
@@ -677,7 +625,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Add(DecFloat34* dfp34_res, DecFloat34  d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Sub(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat16_Sub(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
 
 /**
  * \brief Computes the difference of two DecFloat34 numbers. 
@@ -692,7 +640,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Sub(DecFloat16* dfp16_res, DecFloat16  d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Sub(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat34_Sub(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
 /**
  * \brief Computes the multiplication of two DecFloat16 numbers. 
@@ -707,7 +655,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Sub(DecFloat34* dfp34_res, DecFloat34  d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Mult(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat16_Mult(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
 
 /**
  * \brief Computes the division of two DecFloat34 numbers. 
@@ -722,7 +670,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Mult(DecFloat16* dfp16_res, DecFloat16  
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Mult(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat34_Mult(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
 /**
  * \brief Computes the division of two DecFloat16 numbers. 
@@ -738,7 +686,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Mult(DecFloat34* dfp34_res, DecFloat34  
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers or division is not defined (f.g. 0/0). 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Div(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat16_Div(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
 
 /**
  * \brief Computes the division of two DecFloat34 numbers. 
@@ -754,13 +702,13 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Div(DecFloat16* dfp16_res, DecFloat16  d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers or division is not defined (f.g. 0/0). 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Div(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat34_Div(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
-DECL_EXP DECF_RETURN SAP_API DecFloat16_DIV(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
-DECL_EXP DECF_RETURN SAP_API DecFloat34_DIV(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat16_DIV(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat34_DIV(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
-DECL_EXP DECF_RETURN SAP_API DecFloat16_MOD(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
-DECL_EXP DECF_RETURN SAP_API DecFloat34_MOD(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
+DECF_RETURN DecFloat16_MOD(DecFloat16* dfp16_res, DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs );
+DECF_RETURN DecFloat34_MOD(DecFloat34* dfp34_res, DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs );
 
 
 /* Relational and logical operations */
@@ -779,7 +727,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_MOD(DecFloat34* dfp34_res, DecFloat34  d
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat16_EQ(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
+SAP_BOOL DecFloat16_EQ(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
 
 /**
  * \brief Equality operation for DecFloat34 numbers.
@@ -795,7 +743,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat16_EQ(DecFloat16  dfp16_lhs, DecFloat16  dfp16
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat34_EQ(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc  );
+SAP_BOOL DecFloat34_EQ(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc  );
 
 /* Op >  */
 /**
@@ -812,7 +760,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat34_EQ(DecFloat34  dfp34_lhs, DecFloat34  dfp34
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat16_GT(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
+SAP_BOOL DecFloat16_GT(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
 
 /**
  * \brief Relationál ">" operation for DecFloat34 numbers.
@@ -828,7 +776,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat16_GT(DecFloat16  dfp16_lhs, DecFloat16  dfp16
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat34_GT(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc );
+SAP_BOOL DecFloat34_GT(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc );
 
 /* Op <  */
 /**
@@ -845,7 +793,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat34_GT(DecFloat34  dfp34_lhs, DecFloat34  dfp34
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat16_LT(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
+SAP_BOOL DecFloat16_LT(DecFloat16  dfp16_lhs, DecFloat16  dfp16_rhs, DECF_RETURN* prc );
 
 /**
  * \brief Relationál "<" operation for DecFloat34 numbers.
@@ -861,7 +809,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat16_LT(DecFloat16  dfp16_lhs, DecFloat16  dfp16
  * @return  TRUE,FALSE
  * 
  */
-DECL_EXP SAP_BOOL SAP_API DecFloat34_LT(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc );
+SAP_BOOL DecFloat34_LT(DecFloat34  dfp34_lhs, DecFloat34  dfp34_rhs, DECF_RETURN* prc );
 
 /**
  * \brief This function compares two DecFloat16 numbers numerically. 
@@ -877,7 +825,7 @@ DECL_EXP SAP_BOOL SAP_API DecFloat34_LT(DecFloat34  dfp34_lhs, DecFloat34  dfp34
  *
  * @return -1,0,1
  */
-DECL_EXP SAP_INT SAP_API DecFloat16Compare(DecFloat16 dfp16_lhs, DecFloat16 dfp16_rhs, DECF_RETURN* p_rc);
+SAP_INT DecFloat16Compare(DecFloat16 dfp16_lhs, DecFloat16 dfp16_rhs, DECF_RETURN* p_rc);
 
 /**
  * \brief This function compares two DecFloat34 numbers numerically. 
@@ -893,51 +841,51 @@ DECL_EXP SAP_INT SAP_API DecFloat16Compare(DecFloat16 dfp16_lhs, DecFloat16 dfp1
  *
  * @return -1,0,1
  */
-DECL_EXP SAP_INT SAP_API DecFloat34Compare(DecFloat34 dfp34_lhs, DecFloat34 dfp34_rhs, DECF_RETURN* p_rc);
+SAP_INT DecFloat34Compare(DecFloat34 dfp34_lhs, DecFloat34 dfp34_rhs, DECF_RETURN* p_rc);
 
 /* Rounding */
-DECL_EXP DECF_RETURN SAP_API DecFloat16RoundDec(DecFloat16* dfp16, SAP_INT dec, DecFRounding decFRound);
-DECL_EXP DECF_RETURN SAP_API DecFloat16RoundPrec(DecFloat16* dfp16, SAP_INT prec, DecFRounding decFRound);
+DECF_RETURN DecFloat16RoundDec(DecFloat16* dfp16, SAP_INT dec, DecFRounding decFRound);
+DECF_RETURN DecFloat16RoundPrec(DecFloat16* dfp16, SAP_INT prec, DecFRounding decFRound);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat34RoundDec(DecFloat34* dfp34, SAP_INT dec, DecFRounding decFRound);
-DECL_EXP DECF_RETURN SAP_API DecFloat34RoundPrec(DecFloat34* dfp34, SAP_INT prec, DecFRounding decFRound);
+DECF_RETURN DecFloat34RoundDec(DecFloat34* dfp34, SAP_INT dec, DecFRounding decFRound);
+DECF_RETURN DecFloat34RoundPrec(DecFloat34* dfp34, SAP_INT prec, DecFRounding decFRound);
 
 /* Rescaling */
-DECL_EXP DECF_RETURN SAP_API DecFloat16RescaleDec(DecFloat16* dfp16, SAP_INT dec, DecFRounding decFRound);
-DECL_EXP DECF_RETURN SAP_API DecFloat16RescalePrec(DecFloat16* dfp16, SAP_INT prec, DecFRounding decFRound);
+DECF_RETURN DecFloat16RescaleDec(DecFloat16* dfp16, SAP_INT dec, DecFRounding decFRound);
+DECF_RETURN DecFloat16RescalePrec(DecFloat16* dfp16, SAP_INT prec, DecFRounding decFRound);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat34RescaleDec(DecFloat34* dfp34, SAP_INT dec, DecFRounding decFRound);
-DECL_EXP DECF_RETURN SAP_API DecFloat34RescalePrec(DecFloat34* dfp34, SAP_INT prec, DecFRounding decFRound);
+DECF_RETURN DecFloat34RescaleDec(DecFloat34* dfp34, SAP_INT dec, DecFRounding decFRound);
+DECF_RETURN DecFloat34RescalePrec(DecFloat34* dfp34, SAP_INT prec, DecFRounding decFRound);
 
 /* Utility Functions */
-DECL_EXP SAP_BOOL SAP_API DecFloat16IsInfinite(DecFloat16 dfp16);
-DECL_EXP SAP_BOOL SAP_API DecFloat34IsInfinite(DecFloat34 dfp34);
+SAP_BOOL DecFloat16IsInfinite(DecFloat16 dfp16);
+SAP_BOOL DecFloat34IsInfinite(DecFloat34 dfp34);
 
-DECL_EXP SAP_BOOL SAP_API DecFloat16IsFinite(DecFloat16 dfp16);
-DECL_EXP SAP_BOOL SAP_API DecFloat34IsFinite(DecFloat34 dfp34);
+SAP_BOOL DecFloat16IsFinite(DecFloat16 dfp16);
+SAP_BOOL DecFloat34IsFinite(DecFloat34 dfp34);
 
-DECL_EXP SAP_BOOL SAP_API DecFloat16IsNaN(DecFloat16 dfp16);
-DECL_EXP SAP_BOOL SAP_API DecFloat34IsNaN(DecFloat34 dfp34);
+SAP_BOOL DecFloat16IsNaN(DecFloat16 dfp16);
+SAP_BOOL DecFloat34IsNaN(DecFloat34 dfp34);
 
-DECL_EXP DecFloat16* SAP_API DecFloat16Zero(DecFloat16* dfp16);
-DECL_EXP DecFloat34* SAP_API DecFloat34Zero(DecFloat34* dfp34);
+DecFloat16* DecFloat16Zero(DecFloat16* dfp16);
+DecFloat34* DecFloat34Zero(DecFloat34* dfp34);
 
-DECL_EXP DecFloat16 SAP_API DecFloat16Ceil(DecFloat16 dfp16, DECF_RETURN* p_rc);
-DECL_EXP DecFloat34 SAP_API DecFloat34Ceil(DecFloat34 dfp34, DECF_RETURN* p_rc); 
+DecFloat16 DecFloat16Ceil(DecFloat16 dfp16, DECF_RETURN* p_rc);
+DecFloat34 DecFloat34Ceil(DecFloat34 dfp34, DECF_RETURN* p_rc); 
 
-DECL_EXP DecFloat16 SAP_API DecFloat16Floor(DecFloat16 dfp16, DECF_RETURN* p_rc);
-DECL_EXP DecFloat34 SAP_API DecFloat34Floor(DecFloat34 dfp34, DECF_RETURN* p_rc); 
+DecFloat16 DecFloat16Floor(DecFloat16 dfp16, DECF_RETURN* p_rc);
+DecFloat34 DecFloat34Floor(DecFloat34 dfp34, DECF_RETURN* p_rc); 
 
 /** /brief Minimum IEEE 754r value = -Infinity */
-DECL_EXP DecFloat16 SAP_API GetMinDecFloat16(void);
+DecFloat16 GetMinDecFloat16(void);
 /** /brief Minimum IEEE 754r value = -Infinity */
-DECL_EXP DecFloat34 SAP_API GetMinDecFloat34(void);
+DecFloat34 GetMinDecFloat34(void);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat16GetExponent(SAP_INT* exponent, DecFloat16 dfp16);
-DECL_EXP DECF_RETURN SAP_API DecFloat34GetExponent(SAP_INT* exponent, DecFloat34 dfp34);
+DECF_RETURN DecFloat16GetExponent(SAP_INT* exponent, DecFloat16 dfp16);
+DECF_RETURN DecFloat34GetExponent(SAP_INT* exponent, DecFloat34 dfp34);
 
-DECL_EXP DECF_RETURN SAP_API DecFloat16GetNumOfDigits(SAP_INT* digits, DecFloat16 dfp16);
-DECL_EXP DECF_RETURN SAP_API DecFloat34GetNumOfDigits(SAP_INT* digits, DecFloat34 dfp34);
+DECF_RETURN DecFloat16GetNumOfDigits(SAP_INT* digits, DecFloat16 dfp16);
+DECF_RETURN DecFloat34GetNumOfDigits(SAP_INT* digits, DecFloat34 dfp34);
 
 
 
@@ -953,7 +901,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34GetNumOfDigits(SAP_INT* digits, DecFloat3
  * @return  DECF_OK -- Fine.
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16Neutral(DecFloat16* dfp16_neutral, DecFloat16 dfp16);
+DECF_RETURN DecFloat16ToDecFloat16Neutral(DecFloat16* dfp16_neutral, DecFloat16 dfp16);
 
 /**
  * \brief Converts a neutral DecFloat16 number into its machine-dependent encoding (big- or little-endian).
@@ -967,7 +915,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16ToDecFloat16Neutral(DecFloat16* dfp16_neu
  * @return  DECF_OK -- Fine.
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16NeutralToDecFloat16(DecFloat16* dfp16, DecFloat16 dfp16_neutral);
+DECF_RETURN DecFloat16NeutralToDecFloat16(DecFloat16* dfp16, DecFloat16 dfp16_neutral);
 
 /**
  * \brief Converts a DecFloat34 number into its preferred network byte order.
@@ -981,7 +929,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16NeutralToDecFloat16(DecFloat16* dfp16, De
  * @return  DECF_OK -- Fine.
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34Neutral(DecFloat34* dfp34_neutral, DecFloat34 dfp34);
+DECF_RETURN DecFloat34ToDecFloat34Neutral(DecFloat34* dfp34_neutral, DecFloat34 dfp34);
 
 /**
  * \brief Converts a neutral DecFloat34 number into its machine-dependent encoding (big- or little-endian).
@@ -995,7 +943,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToDecFloat34Neutral(DecFloat34* dfp34_neu
  * @return  DECF_OK -- Fine.
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34NeutralToDecFloat34(DecFloat34* dfp34, DecFloat34 dfp34_neutral);
+DECF_RETURN DecFloat34NeutralToDecFloat34(DecFloat34* dfp34, DecFloat34 dfp34_neutral);
 
 
 /* Normalization functions */
@@ -1013,7 +961,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34NeutralToDecFloat34(DecFloat34* dfp34, De
  * @return  DECF_INVALID_OP -- Arguments are no-numbers . 
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16Normalize(DecFloat16* dfp16);
+DECF_RETURN DecFloat16Normalize(DecFloat16* dfp16);
 
 /**
  * \brief In-place normalization of a DecFloat34 number.
@@ -1028,7 +976,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16Normalize(DecFloat16* dfp16);
  * @return  DECF_INVALID_OP -- Arguments are no-numbers . 
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34Normalize(DecFloat34* dfp34);
+DECF_RETURN DecFloat34Normalize(DecFloat34* dfp34);
 
 /**
  * \brief Converts a DecFloat16 number to a normalized DecFloat16 number.
@@ -1044,7 +992,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34Normalize(DecFloat34* dfp34);
  * @return  DECF_INVALID_OP -- Arguments are no-numbers . 
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16ToNormDecFloat16(DecFloat16* norm_dfp16, DecFloat16 dfp16);
+DECF_RETURN DecFloat16ToNormDecFloat16(DecFloat16* norm_dfp16, DecFloat16 dfp16);
 
 /**
  * \brief Converts a DecFloat34 number to a normalized DecFloat34 number.
@@ -1060,8 +1008,55 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16ToNormDecFloat16(DecFloat16* norm_dfp16, 
  * @return  DECF_INVALID_OP -- Arguments are no-numbers . 
  * 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34ToNormDecFloat34(DecFloat34* norm_dfp34, DecFloat34 dfp34);
+DECF_RETURN DecFloat34ToNormDecFloat34(DecFloat34* norm_dfp34, DecFloat34 dfp34);
 
+
+/* Mathematical functions */
+
+/**
+ * \brief Returns the result of raising the base to the power of the exponent. 
+ * 
+ * The exponent must be a whole number, i.e. any digits in the fractional part of the
+ * exponent must be zero.
+ * @param dfp16_res  Pointer to the IEEE 754r 64-bit variable where the result is stored.
+ * @param base       Base of the power operation.
+ * @param exponent   Exponent of the power operation
+ * @return            DECF_OK -- Fine
+ * @return            DECF_OVERFLOW -- Exponent of result too big.
+ * @return            DECF_NO_MEMORY -- A memory allocation error occured.
+ * @return            DECF_INVALID_OP -- Arguments are no-numbers or exponent contains fractional digits. 
+ */
+DECF_RETURN DecFloat16_Pow(DecFloat16* dfp16_res, DecFloat16 base, SAP_INT exponent);
+
+/**
+ * \brief Returns the result of raising the base to the power of the exponent. 
+ * 
+ * The exponent must be a whole number, i.e. any digits in the fractional part of the
+ * exponent must be zero.
+ * @param dfp34_res  Pointer to the IEEE 754r 128-bit variable where the result is stored.
+ * @param base       Base of the power operation.
+ * @param exponent   Exponent of the power operation
+ * @return            DECF_OK -- Fine
+ * @return            DECF_OVERFLOW -- Exponent of result too big.
+ * @return            DECF_NO_MEMORY -- A memory allocation error occured.
+ * @return            DECF_INVALID_OP -- Arguments are no-numbers or exponent contains fractional digits. 
+ */
+DECF_RETURN DecFloat34_Pow(DecFloat34* dfp34_res, DecFloat34 base, SAP_INT exponent);
+
+/**
+ * \brief Returns the result of raising the base to the power of the exponent. 
+ * 
+ * The exponent can be a fractional number.
+ *
+ * @param dfp16_res  Pointer to the IEEE 754r 64-bit variable where the result is stored.
+ * @param base       Base of the power operation.
+ * @param exponent   Exponent of the power operation
+ * @return            DECF_OK -- Fine
+ * @return            DECF_OVERFLOW -- Exponent of result too big.
+ * @return            DECF_NO_MEMORY -- A memory allocation error occured.
+ * @return            DECF_INVALID_OP -- Arguments are no-numbers or exponent contains fractional digits. 
+ */
+DECF_RETURN DecFloat16_fPow(DecFloat16* dfp16_res, DecFloat16 base, DecFloat16 exponent);
 
 /**
  * \brief Returns the result of raising the base to the power of the exponent. 
@@ -1076,7 +1071,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34ToNormDecFloat34(DecFloat34* norm_dfp34, 
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Arguments are no-numbers or exponent contains fractional digits. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_fPow(DecFloat34* dfp34_res, DecFloat34 base, DecFloat34 exponent);
+DECF_RETURN DecFloat34_fPow(DecFloat34* dfp34_res, DecFloat34 base, DecFloat34 exponent);
 
 
 /**
@@ -1092,7 +1087,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_fPow(DecFloat34* dfp34_res, DecFloat34 b
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Sqrt(DecFloat16* dfp16_res, DecFloat16 dfp16);
+DECF_RETURN DecFloat16_Sqrt(DecFloat16* dfp16_res, DecFloat16 dfp16);
 
 /**
  * \brief Returns the square root of a DecFloat34. 
@@ -1107,7 +1102,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Sqrt(DecFloat16* dfp16_res, DecFloat16 d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Sqrt(DecFloat34* dfp34_res, DecFloat34 dfp34);
+DECF_RETURN DecFloat34_Sqrt(DecFloat34* dfp34_res, DecFloat34 dfp34);
 
 /**
  * \brief Exponential function for DecFloat16 numbers. 
@@ -1130,7 +1125,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Sqrt(DecFloat34* dfp34_res, DecFloat34 d
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Exp(DecFloat16* dfp16_res, DecFloat16 dfp16);
+DECF_RETURN DecFloat16_Exp(DecFloat16* dfp16_res, DecFloat16 dfp16);
 
 /**
  * \brief Exponential function for DecFloat34 numbers. 
@@ -1153,7 +1148,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Exp(DecFloat16* dfp16_res, DecFloat16 df
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Exp(DecFloat34* dfp34_res, DecFloat34 dfp34);
+DECF_RETURN DecFloat34_Exp(DecFloat34* dfp34_res, DecFloat34 dfp34);
 
 /**
  * \brief Natural logarithm function for DecFloat16 numbers. 
@@ -1176,7 +1171,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Exp(DecFloat34* dfp34_res, DecFloat34 df
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Ln(DecFloat16* dfp16_res, DecFloat16 dfp16);
+DECF_RETURN DecFloat16_Ln(DecFloat16* dfp16_res, DecFloat16 dfp16);
 
 /**
  * \brief Natural logarithm function for DecFloat34 numbers. 
@@ -1199,7 +1194,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Ln(DecFloat16* dfp16_res, DecFloat16 dfp
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Ln(DecFloat34* dfp34_res, DecFloat34 dfp16);
+DECF_RETURN DecFloat34_Ln(DecFloat34* dfp34_res, DecFloat34 dfp16);
 
 
 /**
@@ -1223,7 +1218,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Ln(DecFloat34* dfp34_res, DecFloat34 dfp
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16_Log10(DecFloat16* dfp16_res, DecFloat16 dfp16);
+DECF_RETURN DecFloat16_Log10(DecFloat16* dfp16_res, DecFloat16 dfp16);
 
 /**
  * \brief Logarithm in base 10 function for DecFloat34 numbers. 
@@ -1246,7 +1241,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16_Log10(DecFloat16* dfp16_res, DecFloat16 
  * @return            DECF_NO_MEMORY -- A memory allocation error occured.
  * @return            DECF_INVALID_OP -- Argument is no-number or negative. 
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34_Log10(DecFloat34* dfp34_res, DecFloat34 dfp16);
+DECF_RETURN DecFloat34_Log10(DecFloat34* dfp34_res, DecFloat34 dfp16);
 
 
 /**
@@ -1262,7 +1257,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34_Log10(DecFloat34* dfp34_res, DecFloat34 
  * @return           DECF_OK -- Fine.
  * @return           DECF_INVALID_OP -- -- Argument is sNaN.
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16NextMinus(DecFloat16* dfp16_res,DecFloat16 dfp16);
+DECF_RETURN DecFloat16NextMinus(DecFloat16* dfp16_res,DecFloat16 dfp16);
 
 
 /**
@@ -1278,7 +1273,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16NextMinus(DecFloat16* dfp16_res,DecFloat1
  * @return           DECF_OK -- Fine.
  * @return           DECF_INVALID_OP -- -- Argument is sNaN.
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat16NextPlus(DecFloat16* dfp16_res,DecFloat16 dfp16);
+DECF_RETURN DecFloat16NextPlus(DecFloat16* dfp16_res,DecFloat16 dfp16);
 
 
 /**
@@ -1294,7 +1289,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat16NextPlus(DecFloat16* dfp16_res,DecFloat16
  * @return           DECF_OK -- Fine.
  * @return           DECF_INVALID_OP -- -- Argument is sNaN.
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34NextMinus(DecFloat34* dfp34_res,DecFloat34 dfp34);
+DECF_RETURN DecFloat34NextMinus(DecFloat34* dfp34_res,DecFloat34 dfp34);
 
 
 /**
@@ -1310,7 +1305,7 @@ DECL_EXP DECF_RETURN SAP_API DecFloat34NextMinus(DecFloat34* dfp34_res,DecFloat3
  * @return           DECF_OK -- Fine.
  * @return           DECF_INVALID_OP -- -- Argument is sNaN.
  */
-DECL_EXP DECF_RETURN SAP_API DecFloat34NextPlus(DecFloat34* dfp34_res,DecFloat34 dfp34);
+DECF_RETURN DecFloat34NextPlus(DecFloat34* dfp34_res,DecFloat34 dfp34);
 
 
 END_externC

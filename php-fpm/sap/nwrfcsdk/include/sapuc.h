@@ -1,7 +1,7 @@
-/* @(#) $Id: //bas/721_REL/src/include/sapuc.h#10 $ SAP*/
+/* @(#) $Id: //bas/721_REL/src/include/sapuc.h#8 $ SAP*/
 /* CCQ_CCU_FILE_OFF */ /* CCQ_COV_FILE_OFF */ /* CCQ_IPV6_SUPPORT_FILE_OK */ /* CCQ_USE_TIME_T_FILE_OK */
 #ifndef SAPUC_H
-#define SAPUC_H "$Id: //bas/721_REL/src/include/sapuc.h#10 $"
+#define SAPUC_H "$Id: //bas/721_REL/src/include/sapuc.h#8 $"
 
 /*******************************************************************************
  * (c) Copyright SAP AG, Walldorf
@@ -673,8 +673,6 @@
     #else
       #include <wchar.h>
     #endif
-  #elif defined(SAPonLIN)
-    #include <sys/stat.h>     /* mkdir */
   #elif defined(SAPonDARWIN)
 	#if defined(CPP_USE_NEW_C_HEADERS)
       #include <cwchar>
@@ -1021,11 +1019,11 @@
  *----------------------------------------------------------------------------*/
 /* There are two possibilites:
  * (1) In a source file, define 
- *     #define SAP_IDENT "@(#) $Id: //bas/721_REL/src/include/sapuc.h#10 $"
+ *     #define SAP_IDENT "@(#) $Id: //bas/721_REL/src/include/sapuc.h#8 $"
  *     at top of the file (before(!) including sapuc.h).
  *     This identicfication is processed later in sapuc.h
  * (2) In a source file, use the macro
- *     SAP_IDENTN(name,"@(#) $Id: //bas/721_REL/src/include/sapuc.h#10 $")
+ *     SAP_IDENTN(name,"@(#) $Id: //bas/721_REL/src/include/sapuc.h#8 $")
  *     after(!) including saptype.h to define a identication string, that is
  *     not 'sccsid'. Please note: A semicolon must not be placed behind
  *     this macro call, because this would cause errors on pedantic ISO-C
@@ -1607,7 +1605,6 @@ SAP_U16_PROTOTYPE(memset)
 #if defined(SAPonSUN) || defined(SAPonSINIX) || defined(SAPonOSF1) \
       || defined (SAPonLIN) || defined(SAPonAIX) || defined(SAPonPTX) \
       || ( defined(SAPonHP_UX) && defined(SAPwith64_BIT) ) \
-      || ( defined(SAPonOS390) && defined(_UNIX03_SOURCE) ) \
       || defined (SAPonDARW)
   #define dlopenU16_RETURN             void*
   #define dlopenU16_TPARAMS            (const SAP_UTF16* path, int mode)

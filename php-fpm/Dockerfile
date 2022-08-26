@@ -33,6 +33,9 @@ RUN apt-get update \
 	&& pecl install redis-4.0.1 
 	
 RUN apt-get update \
+	&& apt-get install -y yum
+	
+RUN apt-get update \
 	&& pecl install mcrypt-1.0.1
 
 RUN npm install apidoc@0.17.6 -g
@@ -79,7 +82,17 @@ RUN docker-php-ext-install opcache
 RUN docker-php-ext-install gd
 RUN docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
  && docker-php-ext-install pdo_odbc
- 
+
+
+# cannot install odbc wihtout the below because of https://github.com/docker-library/php/issues/103#issuecomment-160772802
+RUN set -x \
+    && cd /usr/src/ && tar -xf php.tar.xz && mv php-7* php \
+    && cd /usr/src/php/ext/odbc \
+    && phpize \
+    && sed -ri 's@^ *test +"\$PHP_.*" *= *"no" *&& *PHP_.*=yes *$@#&@g' configure \
+    && ./configure --with-unixODBC=shared,/usr \ 
+    && docker-php-ext-install odbc
+
  
 # 逐步安裝避免出現Cannot find ldap.h
 RUN apt-get install libldap2-dev -y \ 
@@ -116,6 +129,7 @@ RUN echo 'instantclient,/opt/oracle/instantclient_12_1/' | pecl install oci8-2.2
 
 # Install SAP extensions
 ADD sap/nwrfcsdk /usr/sap/nwrfcsdk
+WORKDIR /usr/sap
 RUN echo /usr/sap/nwrfcsdk/lib > /etc/ld.so.conf.d/nwrfcsdk.conf
 RUN ldconfig
 
@@ -124,8 +138,10 @@ ADD sap/php7-sapnwrfc /home/php7-sapnwrfc
 WORKDIR /home/php7-sapnwrfc
 RUN phpize
 RUN ./configure --with-php-config=/usr/local/bin/php-config
-RUN make \
-	&& make install
+RUN make && make install
+
+
+WORKDIR /var/www
 
 
 
