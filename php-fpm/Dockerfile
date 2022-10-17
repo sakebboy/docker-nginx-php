@@ -1,5 +1,7 @@
 FROM php:7.2-fpm
 
+ARG NODE_VERSION=16
+
 RUN apt-get update && apt-get install iputils-ping -y
 RUN pecl install xdebug-2.6.0 && docker-php-ext-enable xdebug
 
@@ -25,12 +27,14 @@ RUN apt-get update \
 		build-essential \
 		libaio1 \
 		libzip-dev \
-		nodejs \
-		npm \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1 
+	
+RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash 
+RUN apt-get install -y nodejs 
+# RUN apt-get install npm
 	
 RUN apt-get update \
 	&& apt-get install -y yum
