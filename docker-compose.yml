@@ -7,21 +7,19 @@ networks:
 services:
   # define the name of our service
   # corresponds to the "--name" parameter
-#  docker-php-cli:
-#    build: 
-#      context: ./php-cli
-#    tty: true
-#    volumes:
-#      - ../web:/var/www
-#    networks:
-#      - web-network
   docker-nginx:
     build: 
       context: ./nginx
     # defines the port mapping
     # corresponds to the "-p" flag
     ports:
-      - "8080:80"
+      #Vue
+      - "5173:5173"
+      # Web
+      - "8080:8080"
+      - "3000:3000"
+      - "3001:3001"
+      - "80:80"
       # 投等倉
       - "81:81"
       # OM
@@ -44,7 +42,9 @@ services:
       - "99:99"
       # 其他應用
       - "10:10"
-      - "8099:8099"
+      - "2025:2025"
+      - "2026:2026"
+      - "2027:2027"
       # Gina作業
       - "999:999"
       - "998:998"

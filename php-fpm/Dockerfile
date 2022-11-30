@@ -37,9 +37,6 @@ RUN apt-get install -y nodejs
 # RUN apt-get install npm
 	
 RUN apt-get update \
-	&& apt-get install -y yum
-	
-RUN apt-get update \
 	&& pecl install mcrypt-1.0.1
 
 RUN npm install apidoc@0.17.6 -g
