@@ -1,3 +1,3 @@
-FROM mysql:latest
+FROM mariadb
 RUN apt-get update
 
