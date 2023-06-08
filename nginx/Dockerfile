@@ -1,6 +1,6 @@
 FROM nginx:latest
 
-ARG NODE_VERSION=16
+ARG NODE_VERSION=18
 
 RUN apt-get update \
 	&& apt-get install -y vim
