@@ -15,8 +15,10 @@ services:
     ports:
       #Vue
       - "5173:5173"
+      - "8085:8085"
       # Web
       - "8080:8080"
+      - "8081:8081"
       - "3000:3000"
       - "3001:3001"
       - "80:80"
@@ -36,6 +38,8 @@ services:
       - "88:88"
       # 購美廉(新)
       - "888:888"
+      # APP(mtel)
+      - "89:89"
       # 包裹
       - "90:90"
       # 模板
@@ -77,4 +81,12 @@ services:
       MYSQL_ROOT_PASSWORD: Aa123456
       MYSQL_DATABASE: mydb
     command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
-    
+  redis:
+    image: redis:5.0.5-alpine
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - web-network

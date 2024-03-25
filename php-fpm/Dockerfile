@@ -36,7 +36,9 @@ RUN apt-get update \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
-	&& pecl install redis-4.0.1 
+	&& pecl install redis-4.0.1
+	
+RUN pecl install swoole-4.8.13
 	
 RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash 
 RUN apt-get install -y nodejs 
@@ -85,6 +87,7 @@ RUN install-php-extensions sqlsrv
 RUN install-php-extensions mbstring
 RUN install-php-extensions ldap
 RUN install-php-extensions ssh2
+RUN docker-php-ext-enable swoole
 
 RUN docker-php-ext-enable mcrypt
 RUN docker-php-ext-install intl
@@ -162,7 +165,7 @@ RUN phpize
 RUN ./configure --with-sapnwrfc=/usr/sap/nwrfcsdk
 RUN make && make install
 
-RUN docker-php-ext-enable sapnwrfc
+#RUN docker-php-ext-enable sapnwrfc
 
 WORKDIR /var/www
 
