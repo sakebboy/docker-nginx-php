@@ -1,7 +1,14 @@
-FROM php:7.2-fpm
+FROM php:7.4-fpm-buster
+
+ARG NODE_VERSION=18
+
+ENV ACCEPT_EULA=Y
+
+ARG SAPNWRFC_VERSION=1.4.0
+
 
 RUN apt-get update && apt-get install iputils-ping -y
-RUN pecl install xdebug-2.6.0 && docker-php-ext-enable xdebug
+#RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Update OS packages and install required ones.
 # Install selected extensions and other stuff
@@ -25,65 +32,92 @@ RUN apt-get update \
 		build-essential \
 		libaio1 \
 		libzip-dev \
-		nodejs \
-		npm \
+		apt-transport-https \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1 \
 	&& pecl install mcrypt-1.0.1
+	
+RUN pecl install swoole-4.8.13
+	
+RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash 
+RUN apt-get install -y nodejs 
+# RUN apt-get install npm
+	
+RUN apt-get update \
+	&& pecl install mcrypt
 
 RUN npm install apidoc@0.17.6 -g
 
 RUN apt-get update \
 	&& apt-get install -y vim
+
+RUN rm -rf /var/lib/apt/lists/*
 	
 # Add Microsoft repo for Microsoft ODBC Driver 17 for Linux
+#(Install prerequisites for the sqlsrv and pdo_sqlsrv PHP extensions.)
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list 
 
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y \
-    apt-transport-https \
-    msodbcsql17	
+RUN apt-get update && apt-get install -y \
+    msodbcsql17 \	
+    mssql-tools \	
+    unixodbc-dev
 
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
 
 # Install Dependencies
-RUN ACCEPT_EULA=Y apt-get install -y unixodbc
-RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev
-RUN ACCEPT_EULA=Y apt-get install -y libgss3
-RUN ACCEPT_EULA=Y apt-get install -y odbcinst
-RUN ACCEPT_EULA=Y apt-get install -y locales
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+RUN apt-get install -y unixodbc
+RUN apt-get install -y unixodbc-dev
+#RUN apt-get install -y libgss3
+RUN apt-get install -y odbcinst
+#RUN apt-get install -y locales
+#RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 		
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 	
 # Install required extensions
-RUN pecl install apcu-5.1.5 pdo_sqlsrv-5.8.1 sqlsrv-5.8.1 
+RUN chmod uga+x /usr/bin/install-php-extensions \
+    && sync 
+RUN install-php-extensions pcntl
+RUN install-php-extensions pdo_sqlsrv
+RUN install-php-extensions redis
+RUN install-php-extensions sqlsrv
+RUN install-php-extensions mbstring
+RUN install-php-extensions ldap
+RUN install-php-extensions ssh2
+RUN docker-php-ext-enable swoole
+
 RUN docker-php-ext-enable mcrypt
-RUN docker-php-ext-enable apcu
-RUN docker-php-ext-enable sqlsrv
-RUN docker-php-ext-enable pdo_sqlsrv
-RUN docker-php-ext-enable redis
 RUN docker-php-ext-install intl
 RUN docker-php-ext-install mysqli
 RUN docker-php-ext-install pdo
 RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install mbstring
 RUN docker-php-ext-install bcmath
 RUN docker-php-ext-install soap
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install opcache
-RUN docker-php-ext-install gd
 RUN docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
  && docker-php-ext-install pdo_odbc
- 
- 
-# 逐步安裝避免出現Cannot find ldap.h
-RUN apt-get install libldap2-dev -y \ 
-	&& rm -rf /var/lib/apt/lists/* \
-	&& docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
-	&& docker-php-ext-install ldap
+RUN set -eux; \
+	docker-php-ext-configure gd \
+            --prefix=/usr \
+            --with-jpeg \
+            --with-freetype; \
+    docker-php-ext-install gd
+
+#RUN rm -rf /var/lib/apt/lists/*
+
+# cannot install odbc wihtout the below because of https://github.com/docker-library/php/issues/103#issuecomment-160772802
+RUN set -x \
+    && cd /usr/src/ && tar -xf php.tar.xz && mv php-7* php \
+    && cd /usr/src/php/ext/odbc \
+    && phpize \
+    && sed -ri 's@^ *test +"\$PHP_.*" *= *"no" *&& *PHP_.*=yes *$@#&@g' configure \
+    && ./configure --with-unixODBC=shared,/usr \ 
+    && docker-php-ext-install odbc
 
 
 # ORACLE oci 
@@ -110,5 +144,31 @@ RUN echo 'instantclient,/opt/oracle/instantclient_12_1/' | pecl install oci8-2.2
        && docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,/opt/oracle/instantclient_12_1,12.1 \
        && docker-php-ext-install \
                pdo_oci 
+
+
+# Install SAP Netweaver RFC SDK extensions
+ADD sap/nwrfc750P_11-70002752/nwrfcsdk /usr/sap/nwrfcsdk
+WORKDIR /usr/sap
+RUN echo /usr/sap/nwrfcsdk/lib > /etc/ld.so.conf.d/nwrfcsdk.conf
+RUN ldconfig
+
+# Version of Gregor Kraliks SAP Netweaver RFC module source code for PHP 7
+ARG SAPNWRFC_VERSION=1.4.0
+
+# Download Gregor Kraliks SAP Netweaver RFC module source code for PHP 7
+WORKDIR /usr/sap
+RUN curl --insecure --fail --location --remote-name "https://github.com/gkralik/php7-sapnwrfc/archive/${SAPNWRFC_VERSION}.tar.gz"
+
+# Extract the module sources.
+RUN tar xzf ${SAPNWRFC_VERSION}.tar.gz
+WORKDIR php7-sapnwrfc-${SAPNWRFC_VERSION}
+RUN phpize
+RUN ./configure --with-sapnwrfc=/usr/sap/nwrfcsdk
+RUN make && make install
+
+#RUN docker-php-ext-enable sapnwrfc
+
+WORKDIR /var/www
+
 
 
