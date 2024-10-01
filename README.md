@@ -1,5 +1,5 @@
 # docker-nginx-php
-Docker nginx + php7.2 + php-fpm 
+Docker nginx + php7.4 + php-fpm + redis
 
 ## 運行指令
 啟用安裝docker-compose
@@ -37,11 +37,11 @@ Docker nginx + php7.2 + php-fpm
 FROM nginx:latest
 
 ## php-cli
-FROM php:7.2-cli
+FROM php:7.4-cli
 
 ## php-fpm
-FROM php:7.2-fpm
+FROM php:7.4-fpm
 
 ## PHP modules
-php-fpm, apcu, sqlsrv, pdo_sqlsrv, intl, mysqli, pdo, pdo_mysql, mbstring, bcmath, soap, zip, opcache, gd,ldap, oci8, pdo_oci
+php-fpm, apcu, sqlsrv, pdo_sqlsrv, intl, mysqli, pdo, pdo_mysql, mbstring, bcmath, soap, zip, opcache, gd,ldap, oci8, pdo_oci, ssh2, nwrfcsdk, redis
 
