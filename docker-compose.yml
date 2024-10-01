@@ -90,14 +90,4 @@ services:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       - web-network
-  docker-mysql:
-    build: 
-      context: ./mysql
-    volumes:
-      - ~/mysql-docker-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: Aa123456
-      MYSQL_DATABASE: mydb
-    ports:
-      - "3306:3306"
     
