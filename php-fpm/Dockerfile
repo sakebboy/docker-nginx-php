@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-buster
+FROM php:7.4-fpm-bullseye
 
 ARG NODE_VERSION=18
 
@@ -37,8 +37,13 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
 	&& rm /var/log/lastlog /var/log/faillog \
 	&& pecl install redis-4.0.1 \
-	&& pecl install mcrypt-1.0.1
-	
+	&& pecl install mcrypt-1.0.4
+
+RUN apt-get update \
+    && apt-get install -y htop \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN pecl install swoole-4.8.13
 	
 RUN curl -sL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash 
@@ -54,11 +59,26 @@ RUN apt-get update \
 	&& apt-get install -y vim
 
 RUN rm -rf /var/lib/apt/lists/*
+
+# 必要套件
+RUN apt-get update && apt-get install -y \
+    libltdl-dev \
+    libtool \
+    autoconf \
+    automake \
+    make \
+    g++ \
+    unixodbc \
+    unixodbc-dev \
+    && apt-get clean
 	
-# Add Microsoft repo for Microsoft ODBC Driver 17 for Linux
-#(Install prerequisites for the sqlsrv and pdo_sqlsrv PHP extensions.)
+# Microsoft ODBC Driver 17 for SQL Server（Debian 11 repo）
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list 
+    && curl https://packages.microsoft.com/config/debian/11/prod.list \
+       > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
+
 
 RUN apt-get update && apt-get install -y \
     msodbcsql17 \	
@@ -74,7 +94,7 @@ RUN apt-get install -y unixodbc-dev
 RUN apt-get install -y odbcinst
 #RUN apt-get install -y locales
 #RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
-		
+
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 	
