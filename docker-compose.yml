@@ -58,6 +58,10 @@ services:
       - "2025:2025"
       - "2026:2026"
       - "2027:2027"
+      # 錢尼私用
+      - "61:61"
+      - "1001:1001"
+      - "10:10"
     tty: true
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
