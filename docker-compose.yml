@@ -34,24 +34,30 @@ services:
       - "848:848"
       # 財務系統
       - "85:85"
+      # 三友電商中介平台
+      - "86:86"
       # 購美廉
       - "88:88"
       # 購美廉(新)
       - "888:888"
       # APP(mtel)
       - "89:89"
+      # APP OMO
+      - "898:898"
       # 包裹
       - "90:90"
+      # 新版許願池
+      - "91:91"
+      # 切出來給人用的ESL
+      - "92:92"
+      # 萬事屋
+      - "93:93"
       # 模板
       - "99:99"
       # 其他應用
-      - "10:10"
       - "2025:2025"
       - "2026:2026"
       - "2027:2027"
-      # Gina作業
-      - "999:999"
-      - "998:998"
     tty: true
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -59,14 +65,33 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
       - web-network
+  # PHP 7.4 專用 FPM 
   docker-php-fpm:
     build: 
       context: ./php-fpm
     tty: true
+    # 添加 ports 映射
+    ports:
+      - "6001:6001" 
     volumes:
       - ../web:/var/www
       - ./php-fpm/openssl.cnf:/etc/ssl/openssl.cnf
       - ./php-fpm/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - web-network
+  # PHP 8.3.12 專用 FPM（與 docker-php-fpm 並行；Nginx 依站台改 fastcgi_pass）
+  docker-php8-fpm:
+    build:
+      context: .
+      dockerfile: php8-fpm/Dockerfile
+    tty: true
+    ports:
+      # 主機連除錯埠分開避免與 php-fpm 的 6001 衝突
+      - "6002:6001"
+    volumes:
+      - ../web:/var/www
+      - ./php8-fpm/openssl.cnf:/etc/ssl/openssl.cnf
+      - ./php8-fpm/php.ini:/usr/local/etc/php/php.ini
     networks:
       - web-network
   docker-mysql:
